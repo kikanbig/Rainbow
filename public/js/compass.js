@@ -194,15 +194,20 @@ export class CompassRenderer {
         color = `rgba(255, 140, 50, ${0.6 + probability/300})`;
       } else {
         // Радужный градиент для высокой вероятности
-        const grad = ctx.createConicGradient(startAngle, 0, 0);
-        grad.addColorStop(0, '#ff0000');
-        grad.addColorStop(0.17, '#ff8800');
-        grad.addColorStop(0.33, '#ffff00');
-        grad.addColorStop(0.5, '#00cc00');
-        grad.addColorStop(0.67, '#0088ff');
-        grad.addColorStop(0.83, '#4400ff');
-        grad.addColorStop(1, '#ff0000');
-        color = grad;
+        try {
+          const grad = ctx.createConicGradient(startAngle, 0, 0);
+          grad.addColorStop(0, '#ff0000');
+          grad.addColorStop(0.17, '#ff8800');
+          grad.addColorStop(0.33, '#ffff00');
+          grad.addColorStop(0.5, '#00cc00');
+          grad.addColorStop(0.67, '#0088ff');
+          grad.addColorStop(0.83, '#4400ff');
+          grad.addColorStop(1, '#ff0000');
+          color = grad;
+        } catch(e) {
+          // Fallback для старых браузеров
+          color = `rgba(255, 100, 50, 0.9)`;
+        }
       }
       
       ctx.beginPath();
