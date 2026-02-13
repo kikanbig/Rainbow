@@ -31,7 +31,9 @@ class RainbowFinderApp {
    */
   async init() {
     this._cacheDom();
-    this._showScreen('loading');
+    
+    // Сразу показываем основной экран с компасом
+    this._showScreen('main');
     
     // Инициализация компаса
     const canvas = document.getElementById('compass-canvas');
@@ -46,14 +48,8 @@ class RainbowFinderApp {
       return;
     }
 
-    // Показываем экран разрешений
-    this._showScreen('permission');
-    
-    // Обработчик кнопки запуска
-    const startBtn = document.getElementById('start-btn');
-    if (startBtn) {
-      startBtn.addEventListener('click', () => this._requestPermissions());
-    }
+    // Сразу запрашиваем разрешения и запускаем
+    await this._requestPermissions();
 
     // Регистрация Service Worker
     this._registerSW();
@@ -61,7 +57,7 @@ class RainbowFinderApp {
 
   _cacheDom() {
     const ids = [
-      'loading-screen', 'permission-screen', 'main-screen', 'error-screen',
+      'main-screen', 'error-screen',
       'city-name', 'weather-temp', 'weather-desc', 'weather-icon-text',
       'probability-value', 'probability-label', 'probability-fill',
       'direction-text', 'direction-details', 'status-message',
@@ -76,7 +72,7 @@ class RainbowFinderApp {
   }
 
   _showScreen(name) {
-    const screens = ['loading-screen', 'permission-screen', 'main-screen', 'error-screen'];
+    const screens = ['main-screen', 'error-screen'];
     for (const s of screens) {
       const el = document.getElementById(s);
       if (el) el.classList.toggle('active', s === `${name}-screen`);
@@ -94,21 +90,14 @@ class RainbowFinderApp {
    * Запрашивает все необходимые разрешения
    */
   async _requestPermissions() {
-    const btn = document.getElementById('start-btn');
-    if (btn) {
-      btn.textContent = 'Получение разрешений...';
-      btn.disabled = true;
-    }
-
     try {
-      // 1. Геолокация
+      // 1. Геолокация — браузер сразу покажет запрос
       await this._initGeolocation();
       
       // 2. Ориентация устройства (компас)
-      await this._initOrientation();
-      
-      // Показываем основной экран
-      this._showScreen('main');
+      // На iOS requestPermission требует user gesture — 
+      // повесим на первый тап по экрану
+      this._initOrientationOnGesture();
       
       // 3. Загружаем погоду
       await this._loadWeather();
@@ -156,23 +145,37 @@ class RainbowFinderApp {
 
   /**
    * Инициализация компаса (DeviceOrientation)
+   * На Android — подключаемся сразу.
+   * На iOS 13+ — requestPermission требует user gesture,
+   * поэтому вешаем запрос на первый тап по экрану.
    */
-  async _initOrientation() {
-    // iOS 13+ требует запрос разрешения
-    if (typeof DeviceOrientationEvent !== 'undefined' && 
-        typeof DeviceOrientationEvent.requestPermission === 'function') {
-      try {
-        const permission = await DeviceOrientationEvent.requestPermission();
-        if (permission !== 'granted') {
-          console.warn('Device orientation permission denied');
-          return;
-        }
-      } catch (e) {
-        console.warn('DeviceOrientationEvent.requestPermission error:', e);
-        return;
-      }
-    }
+  _initOrientationOnGesture() {
+    const needsPermission = typeof DeviceOrientationEvent !== 'undefined' && 
+        typeof DeviceOrientationEvent.requestPermission === 'function';
 
+    if (needsPermission) {
+      // iOS: запросим разрешение при первом тапе
+      const handler = async () => {
+        try {
+          const permission = await DeviceOrientationEvent.requestPermission();
+          if (permission === 'granted') {
+            this._bindOrientationListeners();
+          }
+        } catch (e) {
+          console.warn('DeviceOrientationEvent.requestPermission error:', e);
+        }
+        document.removeEventListener('click', handler, true);
+        document.removeEventListener('touchend', handler, true);
+      };
+      document.addEventListener('click', handler, true);
+      document.addEventListener('touchend', handler, true);
+    } else {
+      // Android / desktop: подключаемся сразу
+      this._bindOrientationListeners();
+    }
+  }
+
+  _bindOrientationListeners() {
     window.addEventListener('deviceorientationabsolute', (e) => {
       this._handleOrientation(e);
     }, true);

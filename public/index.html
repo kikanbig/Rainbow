@@ -20,41 +20,6 @@
 <body>
   <div id="app" class="theme-day">
 
-    <!-- ========== ЭКРАН ЗАГРУЗКИ ========== -->
-    <div id="loading-screen" class="screen active">
-      <div class="screen-content">
-        <div class="loader-rainbow"></div>
-        <h1 class="app-title">Rainbow Finder</h1>
-        <p class="app-subtitle">Поиск радуги</p>
-      </div>
-    </div>
-
-    <!-- ========== ЭКРАН РАЗРЕШЕНИЙ ========== -->
-    <div id="permission-screen" class="screen">
-      <div class="screen-content">
-        <div class="perm-icon">&#127752;</div>
-        <h1 class="app-title">Rainbow Finder</h1>
-        <p class="perm-desc">
-          Приложение использует вашу геолокацию и датчик ориентации 
-          для расчёта направления и вероятности радуги на основе 
-          реальных погодных данных.
-        </p>
-        <div class="perm-list">
-          <div class="perm-item">
-            <span class="perm-item-icon">&#128205;</span>
-            <span>Геолокация — для определения погоды и положения Солнца</span>
-          </div>
-          <div class="perm-item">
-            <span class="perm-item-icon">&#129517;</span>
-            <span>Компас — для указания направления к радуге</span>
-          </div>
-        </div>
-        <button id="start-btn" class="btn-primary">
-          Начать поиск радуги
-        </button>
-      </div>
-    </div>
-
     <!-- ========== ЭКРАН ОШИБКИ ========== -->
     <div id="error-screen" class="screen">
       <div class="screen-content">
@@ -66,7 +31,7 @@
     </div>
 
     <!-- ========== ОСНОВНОЙ ЭКРАН ========== -->
-    <div id="main-screen" class="screen">
+    <div id="main-screen" class="screen active">
       
       <!-- Верхняя панель: погода -->
       <header class="weather-bar">
