@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#0a0f1e">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Rainbow">
+  <meta name="description" content="Найдите радугу! PWA с компасом, анализом погоды и научным расчётом вероятности радуги.">
+  
+  <title>Rainbow Finder</title>
+  
+  <link rel="manifest" href="/manifest.json">
+  <link rel="icon" type="image/svg+xml" href="/icons/icon.svg">
+  <link rel="apple-touch-icon" href="/icons/icon-192.png">
+  
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <div id="app" class="theme-day">
+
+    <!-- ========== ЭКРАН ЗАГРУЗКИ ========== -->
+    <div id="loading-screen" class="screen active">
+      <div class="screen-content">
+        <div class="loader-rainbow"></div>
+        <h1 class="app-title">Rainbow Finder</h1>
+        <p class="app-subtitle">Поиск радуги</p>
+      </div>
+    </div>
+
+    <!-- ========== ЭКРАН РАЗРЕШЕНИЙ ========== -->
+    <div id="permission-screen" class="screen">
+      <div class="screen-content">
+        <div class="perm-icon">&#127752;</div>
+        <h1 class="app-title">Rainbow Finder</h1>
+        <p class="perm-desc">
+          Приложение использует вашу геолокацию и датчик ориентации 
+          для расчёта направления и вероятности радуги на основе 
+          реальных погодных данных.
+        </p>
+        <div class="perm-list">
+          <div class="perm-item">
+            <span class="perm-item-icon">&#128205;</span>
+            <span>Геолокация — для определения погоды и положения Солнца</span>
+          </div>
+          <div class="perm-item">
+            <span class="perm-item-icon">&#129517;</span>
+            <span>Компас — для указания направления к радуге</span>
+          </div>
+        </div>
+        <button id="start-btn" class="btn-primary">
+          Начать поиск радуги
+        </button>
+      </div>
+    </div>
+
+    <!-- ========== ЭКРАН ОШИБКИ ========== -->
+    <div id="error-screen" class="screen">
+      <div class="screen-content">
+        <div class="error-icon">&#9888;</div>
+        <h2>Не удалось запустить</h2>
+        <p id="error-message"></p>
+        <button class="btn-primary" onclick="location.reload()">Попробовать снова</button>
+      </div>
+    </div>
+
+    <!-- ========== ОСНОВНОЙ ЭКРАН ========== -->
+    <div id="main-screen" class="screen">
+      
+      <!-- Верхняя панель: погода -->
+      <header class="weather-bar">
+        <div class="weather-left">
+          <span id="weather-icon-text" class="weather-emoji"></span>
+          <div>
+            <div id="city-name" class="city-name">Загрузка...</div>
+            <div id="weather-desc" class="weather-desc"></div>
+          </div>
+        </div>
+        <div class="weather-right">
+          <span id="weather-temp" class="weather-temp">—</span>
+        </div>
+      </header>
+
+      <!-- Компас -->
+      <section class="compass-section">
+        <div class="compass-container">
+          <canvas id="compass-canvas"></canvas>
+        </div>
+        <div class="heading-badge">
+          <span id="heading-value">0° С</span>
+        </div>
+      </section>
+
+      <!-- Вероятность -->
+      <section class="probability-section">
+        <div class="probability-card">
+          <div class="probability-header">
+            <span id="probability-value" class="probability-number prob-none">0%</span>
+            <span id="probability-label" class="probability-text">Анализ...</span>
+          </div>
+          <div class="probability-bar">
+            <div id="probability-fill" class="probability-bar-fill"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Направление -->
+      <section class="direction-section">
+        <div class="direction-card">
+          <div id="direction-text" class="direction-main">Определение...</div>
+          <div id="direction-details" class="direction-sub"></div>
+        </div>
+      </section>
+
+      <!-- Детали -->
+      <section class="details-section">
+        <details class="details-panel">
+          <summary class="details-toggle">Подробная информация</summary>
+          
+          <div class="details-grid">
+            <div class="detail-item">
+              <span class="detail-label">Высота Солнца</span>
+              <span id="sun-altitude" class="detail-value">—</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">Азимут Солнца</span>
+              <span id="sun-azimuth" class="detail-value">—</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">Влажность</span>
+              <span id="humidity-value" class="detail-value">—</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">Ветер</span>
+              <span id="wind-value" class="detail-value">—</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">Облачность</span>
+              <span id="clouds-value" class="detail-value">—</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">Видимость</span>
+              <span id="visibility-value" class="detail-value">—</span>
+            </div>
+          </div>
+          
+          <h3 class="factors-title">Факторы вероятности</h3>
+          <div id="factor-list" class="factor-list"></div>
+        </details>
+      </section>
+
+      <!-- Статус -->
+      <footer class="app-footer">
+        <p id="status-message" class="status-text">Rainbow Finder v1.0</p>
+      </footer>
+    </div>
+  </div>
+
+  <script type="module" src="/js/app.js"></script>
+</body>
+</html>

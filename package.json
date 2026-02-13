@@ -1,0 +1,19 @@
+{
+  "name": "rainbow-finder",
+  "version": "1.0.0",
+  "description": "PWA для поиска радуги с компасом и анализом погоды",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "express": "^4.21.2",
+    "dotenv": "^16.4.7"
+  },
+  "keywords": ["rainbow", "pwa", "compass", "weather"],
+  "license": "MIT"
+}
