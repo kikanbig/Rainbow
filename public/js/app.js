@@ -154,7 +154,10 @@ class RainbowFinderApp {
         typeof DeviceOrientationEvent.requestPermission === 'function';
 
     if (needsPermission) {
-      // iOS: запросим разрешение при первом тапе
+      // iOS: показываем подсказку и запрашиваем разрешение при первом тапе
+      const hint = document.getElementById('ios-hint');
+      if (hint) hint.style.display = 'block';
+
       const handler = async () => {
         try {
           const permission = await DeviceOrientationEvent.requestPermission();
@@ -164,6 +167,7 @@ class RainbowFinderApp {
         } catch (e) {
           console.warn('DeviceOrientationEvent.requestPermission error:', e);
         }
+        if (hint) hint.style.display = 'none';
         document.removeEventListener('click', handler, true);
         document.removeEventListener('touchend', handler, true);
       };
@@ -205,6 +209,10 @@ class RainbowFinderApp {
     
     if (heading !== null) {
       this.heading = heading;
+      // Сразу передаём в компас для плавного вращения в реальном времени
+      if (this.compass) {
+        this.compass.update({ heading });
+      }
     }
   }
 
@@ -261,17 +269,18 @@ class RainbowFinderApp {
       );
     }
     
-    // Обновляем компас
-    if (this.compass && sunPos) {
-      const ra = this.rainbowAnalysis;
-      this.compass.update({
-        heading: this.heading,
-        sunAzimuth: sunPos.azimuth,
-        sunAltitude: sunPos.altitude,
-        rainbowAzimuth: ra?.direction?.azimuth ?? (sunPos.azimuth + 180) % 360,
-        probability: ra?.probability ?? 0,
-        rainbowVisible: sunPos.altitude > 0 && sunPos.altitude < 42
-      });
+    // Обновляем компас — heading всегда, остальное при наличии данных
+    if (this.compass) {
+      const update = { heading: this.heading };
+      if (sunPos) {
+        const ra = this.rainbowAnalysis;
+        update.sunAzimuth = sunPos.azimuth;
+        update.sunAltitude = sunPos.altitude;
+        update.rainbowAzimuth = ra?.direction?.azimuth ?? (sunPos.azimuth + 180) % 360;
+        update.probability = ra?.probability ?? 0;
+        update.rainbowVisible = sunPos.altitude > 0 && sunPos.altitude < 42;
+      }
+      this.compass.update(update);
     }
     
     // Обновляем текстовую информацию
