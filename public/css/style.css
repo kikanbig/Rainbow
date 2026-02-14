@@ -418,6 +418,55 @@ html, body {
   line-height: 1.4;
 }
 
+/* ═══ Уведомления ═══ */
+.notif-section {
+  padding: 0 20px 8px;
+}
+
+.notif-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 14px 20px;
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: var(--radius);
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.notif-btn:hover {
+  background: var(--bg-card-hover);
+}
+
+.notif-btn:active {
+  transform: scale(0.98);
+}
+
+.notif-btn.notif-active {
+  border-color: rgba(85, 136, 255, 0.4);
+  background: rgba(85, 136, 255, 0.1);
+  color: var(--accent);
+}
+
+.notif-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.notif-icon {
+  font-size: 18px;
+  line-height: 1;
+}
+
 /* ═══ Детали ═══ */
 .details-section {
   padding: 0 20px 16px;

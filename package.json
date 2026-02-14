@@ -11,9 +11,15 @@
     "node": ">=18.0.0"
   },
   "dependencies": {
+    "dotenv": "^16.4.7",
     "express": "^4.21.2",
-    "dotenv": "^16.4.7"
+    "web-push": "^3.6.7"
   },
-  "keywords": ["rainbow", "pwa", "compass", "weather"],
+  "keywords": [
+    "rainbow",
+    "pwa",
+    "compass",
+    "weather"
+  ],
   "license": "MIT"
 }

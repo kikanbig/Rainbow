@@ -1,4 +1,4 @@
-const CACHE_NAME = 'rainbow-finder-v2';
+const CACHE_NAME = 'rainbow-finder-v3';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
@@ -75,6 +75,60 @@ self.addEventListener('fetch', (event) => {
         }
         return response;
       });
+    })
+  );
+});
+
+// ═══ PUSH-УВЕДОМЛЕНИЯ ═══
+
+// Получение push-уведомления от сервера
+self.addEventListener('push', (event) => {
+  let data = { title: 'Rainbow Finder', body: 'Проверьте условия радуги!' };
+  
+  try {
+    if (event.data) {
+      data = event.data.json();
+    }
+  } catch (e) {
+    console.warn('Push data parse error:', e);
+  }
+
+  const options = {
+    body: data.body || '',
+    icon: '/icons/icon-192.png',
+    badge: '/icons/icon-192.png',
+    vibrate: [200, 100, 200, 100, 200],
+    tag: 'rainbow-alert',
+    renotify: true,
+    requireInteraction: true,
+    data: data.data || {},
+    actions: [
+      { action: 'open', title: 'Открыть компас' },
+      { action: 'dismiss', title: 'Закрыть' }
+    ]
+  };
+
+  event.waitUntil(
+    self.registration.showNotification(data.title || 'Rainbow Finder', options)
+  );
+});
+
+// Клик по уведомлению — открыть приложение
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+
+  if (event.action === 'dismiss') return;
+
+  event.waitUntil(
+    clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
+      // Если приложение уже открыто — фокусируемся на нём
+      for (const client of clientList) {
+        if (client.url.includes(self.location.origin) && 'focus' in client) {
+          return client.focus();
+        }
+      }
+      // Иначе открываем новое окно
+      return clients.openWindow('/');
     })
   );
 });

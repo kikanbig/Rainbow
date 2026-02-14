@@ -102,6 +102,9 @@ class RainbowFinderApp {
       // 3. Загружаем погоду
       await this._loadWeather();
       
+      // 4. Инициализация push-уведомлений
+      this._initPushNotifications();
+      
       // Запускаем обновление
       this._startUpdates();
       
@@ -431,11 +434,169 @@ class RainbowFinderApp {
   async _registerSW() {
     if ('serviceWorker' in navigator) {
       try {
-        await navigator.serviceWorker.register('/sw.js');
+        this.swRegistration = await navigator.serviceWorker.register('/sw.js');
       } catch (e) {
         console.warn('SW registration failed:', e);
       }
     }
+  }
+
+  // ═══════════════════════════════════════════
+  // PUSH-УВЕДОМЛЕНИЯ
+  // ═══════════════════════════════════════════
+
+  /**
+   * Инициализация push-уведомлений
+   * Вызывается после получения геолокации
+   */
+  async _initPushNotifications() {
+    // Проверяем поддержку
+    if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
+      console.warn('Push notifications not supported');
+      this._updateNotifButton('unsupported');
+      return;
+    }
+
+    // Ждём регистрации SW
+    if (!this.swRegistration) {
+      await new Promise(r => setTimeout(r, 1000));
+      if (!this.swRegistration) {
+        this._updateNotifButton('unsupported');
+        return;
+      }
+    }
+
+    // Проверяем текущую подписку
+    try {
+      const existing = await this.swRegistration.pushManager.getSubscription();
+      if (existing) {
+        this.pushSubscription = existing;
+        // Обновляем координаты на сервере
+        await this._sendLocationToServer(existing.endpoint);
+        this._updateNotifButton('subscribed');
+      } else {
+        this._updateNotifButton('default');
+      }
+    } catch (e) {
+      console.warn('Push check error:', e);
+      this._updateNotifButton('default');
+    }
+  }
+
+  /**
+   * Подписка на push-уведомления
+   */
+  async subscribePush() {
+    try {
+      // Запрашиваем разрешение
+      const permission = await Notification.requestPermission();
+      if (permission !== 'granted') {
+        this._updateNotifButton('denied');
+        return;
+      }
+
+      // Получаем VAPID public key с сервера
+      const keyRes = await fetch('/api/vapid-public-key');
+      if (!keyRes.ok) {
+        console.error('VAPID key not available');
+        return;
+      }
+      const { publicKey } = await keyRes.json();
+
+      // Подписываемся
+      const subscription = await this.swRegistration.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: this._urlBase64ToUint8Array(publicKey)
+      });
+
+      // Отправляем подписку на сервер
+      await fetch('/api/push/subscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          subscription: subscription.toJSON(),
+          lat: this.lat,
+          lon: this.lon
+        })
+      });
+
+      this.pushSubscription = subscription;
+      this._updateNotifButton('subscribed');
+    } catch (err) {
+      console.error('Push subscribe error:', err);
+    }
+  }
+
+  /**
+   * Отписка от push-уведомлений
+   */
+  async unsubscribePush() {
+    try {
+      if (this.pushSubscription) {
+        const endpoint = this.pushSubscription.endpoint;
+        await this.pushSubscription.unsubscribe();
+        await fetch('/api/push/unsubscribe', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ endpoint })
+        });
+        this.pushSubscription = null;
+      }
+      this._updateNotifButton('default');
+    } catch (err) {
+      console.error('Push unsubscribe error:', err);
+    }
+  }
+
+  /**
+   * Обновляет координаты на сервере
+   */
+  async _sendLocationToServer(endpoint) {
+    try {
+      await fetch('/api/push/update-location', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ endpoint, lat: this.lat, lon: this.lon })
+      });
+    } catch (e) { /* тихо */ }
+  }
+
+  /**
+   * Обновляет состояние кнопки уведомлений
+   */
+  _updateNotifButton(state) {
+    const btn = document.getElementById('notif-btn');
+    const label = document.getElementById('notif-label');
+    if (!btn) return;
+
+    switch (state) {
+      case 'subscribed':
+        btn.classList.add('notif-active');
+        btn.onclick = () => this.unsubscribePush();
+        if (label) label.textContent = 'Уведомления включены';
+        break;
+      case 'denied':
+        btn.classList.remove('notif-active');
+        btn.disabled = true;
+        if (label) label.textContent = 'Уведомления заблокированы';
+        break;
+      case 'unsupported':
+        btn.style.display = 'none';
+        break;
+      default:
+        btn.classList.remove('notif-active');
+        btn.onclick = () => this.subscribePush();
+        if (label) label.textContent = 'Включить уведомления';
+    }
+  }
+
+  _urlBase64ToUint8Array(base64String) {
+    const padding = '='.repeat((4 - base64String.length % 4) % 4);
+    const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+    const raw = atob(base64);
+    const arr = new Uint8Array(raw.length);
+    for (let i = 0; i < raw.length; i++) arr[i] = raw.charCodeAt(i);
+    return arr;
   }
 
   destroy() {
