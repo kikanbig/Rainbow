@@ -106,6 +106,9 @@ class RainbowFinderApp {
       // 4. Инициализация push-уведомлений
       this._initPushNotifications();
       
+      // ВРЕМЕННО: тестовая кнопка для проверки уведомлений (удалить после проверки)
+      this._initTestButton();
+      
       // Запускаем обновление
       this._startUpdates();
       
@@ -766,6 +769,48 @@ class RainbowFinderApp {
     const arr = new Uint8Array(raw.length);
     for (let i = 0; i < raw.length; i++) arr[i] = raw.charCodeAt(i);
     return arr;
+  }
+
+  // ═══════════════════════════════════════════
+  // ТЕСТОВАЯ КНОПКА (удалить после проверки)
+  // ═══════════════════════════════════════════
+
+  _initTestButton() {
+    const btn = document.getElementById('test-notif-btn');
+    if (!btn) return;
+
+    btn.onclick = async () => {
+      btn.disabled = true;
+      btn.textContent = '⏳';
+      
+      try {
+        const res = await fetch('/api/push/test', { method: 'POST' });
+        const data = await res.json();
+        
+        if (data.success) {
+          btn.textContent = '✅';
+          console.log(`Тестовое уведомление отправлено: ${data.sent} успешно, ${data.failed} ошибок`);
+          setTimeout(() => {
+            btn.textContent = '🧪';
+            btn.disabled = false;
+          }, 2000);
+        } else {
+          btn.textContent = '❌';
+          console.error('Ошибка теста:', data.error);
+          setTimeout(() => {
+            btn.textContent = '🧪';
+            btn.disabled = false;
+          }, 2000);
+        }
+      } catch (e) {
+        btn.textContent = '❌';
+        console.error('Ошибка отправки теста:', e);
+        setTimeout(() => {
+          btn.textContent = '🧪';
+          btn.disabled = false;
+        }, 2000);
+      }
+    };
   }
 
   destroy() {

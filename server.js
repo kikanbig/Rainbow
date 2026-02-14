@@ -89,6 +89,12 @@ app.post('/api/push/update-location', (req, res) => {
   res.json({ success: true });
 });
 
+// ═══ ТЕСТОВЫЙ endpoint — отправить уведомление всем (для проверки) ═══
+app.post('/api/push/test', async (req, res) => {
+  const result = await notifications.sendTestNotification();
+  res.json(result);
+});
+
 // ═══ Proxy: текущая погода ═══
 app.get('/api/weather', async (req, res) => {
   const { lat, lon } = req.query;
