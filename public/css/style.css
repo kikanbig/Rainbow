@@ -94,8 +94,8 @@ html, body {
   overflow-y: auto;
   overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
-  padding-top: var(--safe-top);
-  padding-bottom: var(--safe-bottom);
+  padding-top: 0;
+  padding-bottom: 0;
 }
 
 .screen-content {
