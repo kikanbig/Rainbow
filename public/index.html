@@ -45,6 +45,12 @@
         </div>
         <div class="weather-right">
           <span id="weather-temp" class="weather-temp">—</span>
+          <button id="notif-btn" class="notif-bell" aria-label="Уведомления">
+            <svg id="bell-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+              <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+            </svg>
+          </button>
         </div>
       </header>
 
@@ -80,14 +86,6 @@
           <div id="direction-text" class="direction-main">Определение...</div>
           <div id="direction-details" class="direction-sub"></div>
         </div>
-      </section>
-
-      <!-- Уведомления -->
-      <section class="notif-section">
-        <button id="notif-btn" class="notif-btn">
-          <span class="notif-icon">&#128276;</span>
-          <span id="notif-label">Включить уведомления</span>
-        </button>
       </section>
 
       <!-- Детали -->
@@ -127,9 +125,11 @@
         </details>
       </section>
 
-      <!-- Статус -->
-      <footer class="app-footer">
-        <p id="status-message" class="status-text">Rainbow Finder v1.0</p>
+      <!-- Цитата дня -->
+      <footer class="quote-footer">
+        <div class="quote-card">
+          <p id="quote-text" class="quote-text"></p>
+        </div>
       </footer>
     </div>
   </div>
