@@ -213,12 +213,9 @@ html, body {
   align-items: center;
   justify-content: space-between;
   padding: 10px 20px;
-  background: rgba(255, 255, 255, 0.85);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  background: transparent;
   border-bottom: none;
   width: 100%;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
 .weather-left {
@@ -230,19 +227,22 @@ html, body {
 .weather-emoji {
   font-size: 28px;
   line-height: 1;
+  filter: drop-shadow(0 2px 4px rgba(255, 255, 255, 0.6));
 }
 
 .city-name {
   font-size: 15px;
   font-weight: 600;
   color: #1a1a1a;
+  text-shadow: 0 1px 3px rgba(255, 255, 255, 0.8);
 }
 
 .weather-desc {
   font-size: 12px;
-  color: #666;
+  color: #333;
   text-transform: capitalize;
   margin-top: 2px;
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.6);
 }
 
 .weather-right {
@@ -255,6 +255,7 @@ html, body {
   font-weight: 700;
   color: #1a1a1a;
   letter-spacing: -1px;
+  text-shadow: 0 1px 3px rgba(255, 255, 255, 0.8);
 }
 
 /* Колокольчик уведомлений — плавает в правом верхнем углу compass-section */
