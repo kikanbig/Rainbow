@@ -306,7 +306,7 @@ function getStatusMessage(probability, direction, sunPosition, isRaining) {
       status: 'medium',
       message: isRaining 
         ? `Возможна радуга на ${direction?.directionName || ''} при просветах в облаках`
-        : `Умеренные шансы. Следите за дождём на ${direction?.directionName || 'горизонте'}`
+        : `Умеренные шансы. Смотрите на ${direction?.directionName || 'горизонт'} — там может появиться радуга`
     };
   }
   
