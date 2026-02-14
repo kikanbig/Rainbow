@@ -1,6 +1,8 @@
 require('dotenv').config();
 const express = require('express');
 const path = require('path');
+const crypto = require('crypto');
+const fs = require('fs');
 const notifications = require('./lib/notifications');
 
 const app = express();
@@ -8,16 +10,45 @@ const PORT = process.env.PORT || 3000;
 const WEATHER_API_KEY = process.env.OPENWEATHER_API_KEY || '';
 const VAPID_PUBLIC_KEY = process.env.VAPID_PUBLIC_KEY || '';
 
+// ═══ Версия билда (хеш ключевых файлов) ═══
+function computeBuildVersion() {
+  const files = [
+    'server.js',
+    'public/index.html',
+    'public/js/app.js',
+    'public/js/compass.js',
+    'public/js/rainbow.js',
+    'public/js/suncalc.js',
+    'public/js/weather.js',
+    'public/css/style.css',
+    'public/sw.js'
+  ];
+  const hash = crypto.createHash('md5');
+  for (const f of files) {
+    try { hash.update(fs.readFileSync(path.join(__dirname, f))); } catch(e) {}
+  }
+  return hash.digest('hex').slice(0, 12);
+}
+const BUILD_VERSION = computeBuildVersion();
+console.log(`Build version: ${BUILD_VERSION}`);
+
 app.use(express.json());
 
 app.use(express.static(path.join(__dirname, 'public'), {
   maxAge: '1h',
   setHeaders(res, filePath) {
-    if (filePath.endsWith('.html')) {
-      res.setHeader('Cache-Control', 'no-cache');
+    // HTML и SW — всегда без кэша, чтобы обновления приходили сразу
+    if (filePath.endsWith('.html') || filePath.endsWith('sw.js')) {
+      res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
     }
   }
 }));
+
+// ═══ Версия приложения ═══
+app.get('/api/version', (req, res) => {
+  res.setHeader('Cache-Control', 'no-cache, no-store');
+  res.json({ version: BUILD_VERSION });
+});
 
 // ═══ VAPID public key (клиент запрашивает для подписки) ═══
 app.get('/api/vapid-public-key', (req, res) => {

@@ -429,16 +429,134 @@ class RainbowFinderApp {
   }
 
   /**
-   * Регистрация Service Worker
+   * Регистрация Service Worker + система обновлений
    */
   async _registerSW() {
-    if ('serviceWorker' in navigator) {
-      try {
-        this.swRegistration = await navigator.serviceWorker.register('/sw.js');
-      } catch (e) {
-        console.warn('SW registration failed:', e);
+    if (!('serviceWorker' in navigator)) return;
+
+    try {
+      this.swRegistration = await navigator.serviceWorker.register('/sw.js');
+
+      // Отслеживаем обновление SW
+      this.swRegistration.addEventListener('updatefound', () => {
+        const newWorker = this.swRegistration.installing;
+        if (!newWorker) return;
+
+        newWorker.addEventListener('statechange', () => {
+          // Новый SW установлен и ждёт активации
+          if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+            this._applyUpdate(newWorker);
+          }
+        });
+      });
+
+      // Если при загрузке уже есть ожидающий SW — применяем
+      if (this.swRegistration.waiting) {
+        this._applyUpdate(this.swRegistration.waiting);
+      }
+
+      // Когда новый SW взял контроль — перезагружаем страницу
+      let refreshing = false;
+      navigator.serviceWorker.addEventListener('controllerchange', () => {
+        if (!refreshing) {
+          refreshing = true;
+          window.location.reload();
+        }
+      });
+
+    } catch (e) {
+      console.warn('SW registration failed:', e);
+    }
+
+    // Запуск проверки версии с сервера
+    this._startVersionChecker();
+  }
+
+  /**
+   * Применяет обновление: показывает тост и активирует новый SW
+   */
+  _applyUpdate(waitingWorker) {
+    this._showUpdateToast();
+    // Через 1.5 секунды отправляем команду на активацию
+    setTimeout(() => {
+      waitingWorker.postMessage('SKIP_WAITING');
+    }, 1500);
+  }
+
+  /**
+   * Периодическая проверка версии через /api/version
+   * Проверяет: каждые 60 сек + при возврате в приложение (visibilitychange)
+   */
+  _startVersionChecker() {
+    // Получаем текущую версию при старте
+    this._fetchVersion().then(v => { this._currentVersion = v; });
+
+    // Проверка каждые 60 секунд
+    setInterval(() => this._checkForUpdate(), 60 * 1000);
+
+    // Проверка при возврате в приложение
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') {
+        this._checkForUpdate();
+        // Также просим браузер проверить обновление SW
+        if (this.swRegistration) {
+          this.swRegistration.update().catch(() => {});
+        }
+      }
+    });
+  }
+
+  async _fetchVersion() {
+    try {
+      const res = await fetch('/api/version', { cache: 'no-store' });
+      if (!res.ok) return null;
+      const data = await res.json();
+      return data.version || null;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  async _checkForUpdate() {
+    const newVersion = await this._fetchVersion();
+    if (!newVersion || !this._currentVersion) {
+      if (newVersion) this._currentVersion = newVersion;
+      return;
+    }
+    if (newVersion !== this._currentVersion) {
+      console.log(`[Update] ${this._currentVersion} → ${newVersion}`);
+      this._currentVersion = newVersion;
+      this._showUpdateToast();
+      // Принудительно проверяем SW
+      if (this.swRegistration) {
+        await this.swRegistration.update().catch(() => {});
+        // Если есть waiting worker — активируем
+        if (this.swRegistration.waiting) {
+          this.swRegistration.waiting.postMessage('SKIP_WAITING');
+        } else {
+          // SW обновился сам, просто перезагрузим
+          setTimeout(() => window.location.reload(), 2000);
+        }
+      } else {
+        setTimeout(() => window.location.reload(), 2000);
       }
     }
+  }
+
+  /**
+   * Показать тост "Обновление..."
+   */
+  _showUpdateToast() {
+    // Не показываем повторно
+    if (document.getElementById('update-toast')) return;
+
+    const toast = document.createElement('div');
+    toast.id = 'update-toast';
+    toast.className = 'update-toast';
+    toast.innerHTML = '<span class="update-spinner"></span> Обновление приложения...';
+    document.body.appendChild(toast);
+    // Плавное появление
+    requestAnimationFrame(() => toast.classList.add('visible'));
   }
 
   // ═══════════════════════════════════════════
