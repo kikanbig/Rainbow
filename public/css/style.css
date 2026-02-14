@@ -384,12 +384,13 @@ html, body {
 }
 
 .probability-card {
-  background: rgba(255, 255, 255, 0.9);
+  background: transparent;
+  border: 2px solid rgba(255, 255, 255, 0.4);
   border-radius: var(--radius);
   padding: 16px 20px;
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  box-shadow: none;
 }
 
 .probability-header {
@@ -428,7 +429,8 @@ html, body {
 
 .probability-text {
   font-size: 14px;
-  color: #666;
+  color: #1a1a1a;
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.6);
 }
 
 .probability-bar {
@@ -452,13 +454,14 @@ html, body {
 }
 
 .direction-card {
-  background: rgba(255, 255, 255, 0.9);
+  background: transparent;
+  border: 2px solid rgba(255, 255, 255, 0.4);
   border-radius: var(--radius);
   padding: 16px 20px;
   text-align: center;
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  box-shadow: none;
 }
 
 .direction-main {
@@ -466,12 +469,14 @@ html, body {
   font-weight: 600;
   color: #1a1a1a;
   margin-bottom: 4px;
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.6);
 }
 
 .direction-sub {
   font-size: 13px;
-  color: #666;
+  color: #1a1a1a;
   line-height: 1.4;
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.5);
 }
 
 
@@ -481,19 +486,21 @@ html, body {
 }
 
 .details-panel {
-  background: rgba(255, 255, 255, 0.9);
+  background: transparent;
+  border: 2px solid rgba(255, 255, 255, 0.4);
   border-radius: var(--radius);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
   overflow: hidden;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  box-shadow: none;
 }
 
 .details-toggle {
   padding: 14px 20px;
   font-size: 14px;
   font-weight: 600;
-  color: #666;
+  color: #1a1a1a;
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.5);
   cursor: pointer;
   list-style: none;
   display: flex;
@@ -531,24 +538,29 @@ details[open] .details-toggle::after {
 
 .detail-label {
   font-size: 11px;
-  color: #999;
+  color: #1a1a1a;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   margin-bottom: 4px;
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.5);
+  opacity: 0.7;
 }
 
 .detail-value {
   font-size: 18px;
   font-weight: 700;
   color: #1a1a1a;
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.6);
 }
 
 .factors-title {
   font-size: 13px;
-  color: #999;
+  color: #1a1a1a;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   padding: 8px 20px 12px;
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.5);
+  opacity: 0.7;
 }
 
 .factor-list {
@@ -571,13 +583,16 @@ details[open] .details-toggle::after {
 }
 
 .factor-name {
-  color: #666;
+  color: #1a1a1a;
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.5);
 }
 
 .factor-score {
-  color: #999;
+  color: #1a1a1a;
   font-weight: 600;
   font-variant-numeric: tabular-nums;
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.5);
+  opacity: 0.8;
 }
 
 .factor-bar {
@@ -609,11 +624,12 @@ details[open] .details-toggle::after {
   display: flex;
   flex-direction: column;
   align-items: center;
-  background: rgba(255, 255, 255, 0.9);
+  background: transparent;
+  border: 2px solid rgba(255, 255, 255, 0.4);
   border-radius: var(--radius);
   padding: 22px 28px;
   text-align: center;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  box-shadow: none;
 }
 
 .quote-mark {
@@ -632,9 +648,10 @@ details[open] .details-toggle::after {
   font-size: 16px;
   font-style: italic;
   line-height: 1.7;
-  color: #333;
+  color: #1a1a1a;
   margin: 8px 0;
   font-family: Georgia, "Times New Roman", serif;
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.6);
 }
 
 /* ═══ Тост обновления ═══ */
