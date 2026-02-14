@@ -35,7 +35,7 @@ html, body {
   height: 100%;
   overflow: hidden;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", system-ui, sans-serif;
-  background: var(--bg-primary);
+  background: transparent;
   color: var(--text-primary);
   -webkit-font-smoothing: antialiased;
   -webkit-text-size-adjust: 100%;
@@ -46,11 +46,7 @@ html, body {
 
 #app {
   height: 100%;
-  background-image: url('/images/background.png');
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  background-attachment: fixed;
+  background: url('/images/background.png') center/cover no-repeat fixed;
 }
 
 /* Темы (зависят от положения солнца) */

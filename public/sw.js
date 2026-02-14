@@ -1,13 +1,13 @@
-const CACHE_NAME = 'rainbow-finder-v15';
+const CACHE_NAME = 'rainbow-finder-v16';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
-  '/css/style.css?v=15',
-  '/js/app.js?v=15',
-  '/js/suncalc.js?v=15',
-  '/js/weather.js?v=15',
-  '/js/rainbow.js?v=15',
-  '/js/compass.js?v=15',
+  '/css/style.css?v=16',
+  '/js/app.js?v=16',
+  '/js/suncalc.js?v=16',
+  '/js/weather.js?v=16',
+  '/js/rainbow.js?v=16',
+  '/js/compass.js?v=16',
   '/images/background.png',
   '/manifest.json',
   '/icons/icon.svg'
