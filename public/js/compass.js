@@ -150,11 +150,11 @@ export class CompassRenderer {
   _drawBackground(r) {
     const { ctx, dpr } = this;
     
-    // Основной фон компаса
+    // Полупрозрачный светлый фон компаса
     const grad = ctx.createRadialGradient(0, 0, r * 0.1, 0, 0, r);
-    grad.addColorStop(0, 'rgba(20, 25, 40, 0.95)');
-    grad.addColorStop(0.7, 'rgba(15, 20, 35, 0.98)');
-    grad.addColorStop(1, 'rgba(10, 15, 25, 0.99)');
+    grad.addColorStop(0, 'rgba(255, 255, 255, 0.6)');
+    grad.addColorStop(0.7, 'rgba(255, 255, 255, 0.5)');
+    grad.addColorStop(1, 'rgba(255, 255, 255, 0.4)');
     
     ctx.beginPath();
     ctx.arc(0, 0, r, 0, Math.PI * 2);
@@ -162,7 +162,7 @@ export class CompassRenderer {
     ctx.fill();
     
     // Тонкая обводка
-    ctx.strokeStyle = 'rgba(100, 140, 200, 0.3)';
+    ctx.strokeStyle = 'rgba(100, 140, 200, 0.4)';
     ctx.lineWidth = 1.5 * dpr;
     ctx.stroke();
   }
@@ -274,9 +274,9 @@ export class CompassRenderer {
     
     const labels = [
       { text: 'С', angle: 0, color: '#ff4444' },
-      { text: 'В', angle: 90, color: '#aabbdd' },
-      { text: 'Ю', angle: 180, color: '#aabbdd' },
-      { text: 'З', angle: 270, color: '#aabbdd' }
+      { text: 'В', angle: 90, color: '#4a5568' },
+      { text: 'Ю', angle: 180, color: '#4a5568' },
+      { text: 'З', angle: 270, color: '#4a5568' }
     ];
     
     const labelR = r * 0.73;
@@ -323,7 +323,7 @@ export class CompassRenderer {
       const x = Math.sin(rad) * subLabelR;
       const y = -Math.cos(rad) * subLabelR;
       
-      ctx.fillStyle = 'rgba(150, 170, 200, 0.5)';
+      ctx.fillStyle = 'rgba(74, 85, 104, 0.6)';
       ctx.fillText(label.text, x, y);
     }
   }
