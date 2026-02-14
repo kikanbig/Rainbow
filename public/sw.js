@@ -1,13 +1,13 @@
-const CACHE_NAME = 'rainbow-finder-v11';
+const CACHE_NAME = 'rainbow-finder-v12';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
-  '/css/style.css?v=11',
-  '/js/app.js?v=11',
-  '/js/suncalc.js?v=11',
-  '/js/weather.js?v=11',
-  '/js/rainbow.js?v=11',
-  '/js/compass.js?v=11',
+  '/css/style.css?v=12',
+  '/js/app.js?v=12',
+  '/js/suncalc.js?v=12',
+  '/js/weather.js?v=12',
+  '/js/rainbow.js?v=12',
+  '/js/compass.js?v=12',
   '/manifest.json',
   '/icons/icon.svg'
 ];
@@ -74,14 +74,17 @@ self.addEventListener('fetch', (event) => {
 
 // Получение push-уведомления от сервера
 self.addEventListener('push', (event) => {
+  console.log('[SW] 🔔 Push event received!', event);
+  
   let data = { title: 'Rainbow Finder', body: 'Проверьте условия радуги!' };
   
   try {
     if (event.data) {
       data = event.data.json();
+      console.log('[SW] Push data:', data);
     }
   } catch (e) {
-    console.warn('Push data parse error:', e);
+    console.warn('[SW] Push data parse error:', e);
   }
 
   const options = {
@@ -91,16 +94,20 @@ self.addEventListener('push', (event) => {
     vibrate: [200, 100, 200, 100, 200],
     tag: 'rainbow-alert',
     renotify: true,
-    requireInteraction: true,
+    requireInteraction: false, // Изменено: Android может блокировать requireInteraction
     data: data.data || {},
     actions: [
-      { action: 'open', title: 'Открыть компас' },
+      { action: 'open', title: 'Открыть' },
       { action: 'dismiss', title: 'Закрыть' }
     ]
   };
 
+  console.log('[SW] Showing notification:', data.title, options);
+
   event.waitUntil(
     self.registration.showNotification(data.title || 'Rainbow Finder', options)
+      .then(() => console.log('[SW] ✅ Notification shown successfully'))
+      .catch(err => console.error('[SW] ❌ Notification error:', err))
   );
 });
 
