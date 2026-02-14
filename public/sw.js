@@ -1,4 +1,4 @@
-const CACHE_NAME = 'rainbow-finder-v6';
+const CACHE_NAME = 'rainbow-finder-v7';
 const STATIC_ASSETS = [
   '/',
   '/index.html',

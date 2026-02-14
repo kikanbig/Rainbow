@@ -90,22 +90,20 @@ class RainbowFinderApp {
    * Запрашивает все необходимые разрешения
    */
   async _requestPermissions() {
+    // Цитата дня — показываем СРАЗУ, до всего остального
+    try { this._showQuoteOfTheDay(); } catch(e) { console.warn('Quote error:', e); }
+
     try {
       // 1. Геолокация — браузер сразу покажет запрос
       await this._initGeolocation();
       
       // 2. Ориентация устройства (компас)
-      // На iOS requestPermission требует user gesture — 
-      // повесим на первый тап по экрану
       this._initOrientationOnGesture();
       
-      // 3. Цитата дня (показываем сразу, не зависит от погоды)
-      this._showQuoteOfTheDay();
-      
-      // 4. Загружаем погоду
+      // 3. Загружаем погоду
       await this._loadWeather();
       
-      // 5. Инициализация push-уведомлений
+      // 4. Инициализация push-уведомлений
       this._initPushNotifications();
       
       // Запускаем обновление
