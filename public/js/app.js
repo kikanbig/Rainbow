@@ -784,19 +784,37 @@ class RainbowFinderApp {
       btn.textContent = '⏳';
       
       try {
+        // Сначала проверяем статус
+        const statsRes = await fetch('/api/push/stats');
+        const stats = await statsRes.json();
+        console.log('📊 Статус уведомлений:', stats);
+        
+        if (stats.subscribers === 0) {
+          btn.textContent = '❌';
+          console.error('❌ Нет подписчиков! Сначала нажмите на колокольчик справа и разрешите уведомления.');
+          alert('Сначала включите уведомления (колокольчик справа)');
+          setTimeout(() => {
+            btn.textContent = '🧪';
+            btn.disabled = false;
+          }, 2000);
+          return;
+        }
+
+        // Отправляем тест
         const res = await fetch('/api/push/test', { method: 'POST' });
         const data = await res.json();
         
         if (data.success) {
           btn.textContent = '✅';
-          console.log(`Тестовое уведомление отправлено: ${data.sent} успешно, ${data.failed} ошибок`);
+          console.log(`✅ Тестовое уведомление отправлено: ${data.sent} успешно, ${data.failed} ошибок`);
           setTimeout(() => {
             btn.textContent = '🧪';
             btn.disabled = false;
           }, 2000);
         } else {
           btn.textContent = '❌';
-          console.error('Ошибка теста:', data.error);
+          console.error('❌ Ошибка теста:', data.error);
+          alert(`Ошибка: ${data.error}`);
           setTimeout(() => {
             btn.textContent = '🧪';
             btn.disabled = false;
@@ -804,7 +822,7 @@ class RainbowFinderApp {
         }
       } catch (e) {
         btn.textContent = '❌';
-        console.error('Ошибка отправки теста:', e);
+        console.error('❌ Ошибка отправки теста:', e);
         setTimeout(() => {
           btn.textContent = '🧪';
           btn.disabled = false;

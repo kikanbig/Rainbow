@@ -54,9 +54,19 @@ app.get('/api/version', (req, res) => {
 // ═══ VAPID public key (клиент запрашивает для подписки) ═══
 app.get('/api/vapid-public-key', (req, res) => {
   if (!VAPID_PUBLIC_KEY) {
+    console.warn('[Server] VAPID ключи не настроены!');
     return res.status(503).json({ error: 'Push-уведомления не настроены' });
   }
   res.json({ publicKey: VAPID_PUBLIC_KEY });
+});
+
+// ═══ Статус уведомлений (для отладки) ═══
+app.get('/api/push/stats', (req, res) => {
+  const stats = notifications.getStats();
+  res.json({
+    ...stats,
+    vapidConfigured: !!(VAPID_PUBLIC_KEY && process.env.VAPID_PRIVATE_KEY)
+  });
 });
 
 // ═══ Подписка на push-уведомления ═══
