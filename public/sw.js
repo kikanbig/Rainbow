@@ -1,21 +1,22 @@
-const CACHE_NAME = 'rainbow-finder-v7';
+const CACHE_NAME = 'rainbow-finder-v8';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
-  '/css/style.css',
-  '/js/app.js',
-  '/js/suncalc.js',
-  '/js/weather.js',
-  '/js/rainbow.js',
-  '/js/compass.js',
+  '/css/style.css?v=8',
+  '/js/app.js?v=8',
+  '/js/suncalc.js?v=8',
+  '/js/weather.js?v=8',
+  '/js/rainbow.js?v=8',
+  '/js/compass.js?v=8',
   '/manifest.json',
   '/icons/icon.svg'
 ];
 
 // ═══ УСТАНОВКА ═══
-// Кэшируем ресурсы. НЕ вызываем skipWaiting() —
-// вместо этого ждём команду от клиента для контролируемого обновления.
+// Принудительно активируем новый SW сразу (skipWaiting),
+// чтобы обновления доходили до пользователя без задержки.
 self.addEventListener('install', (event) => {
+  self.skipWaiting();
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => cache.addAll(STATIC_ASSETS))
   );

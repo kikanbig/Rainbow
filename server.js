@@ -35,11 +35,12 @@ console.log(`Build version: ${BUILD_VERSION}`);
 app.use(express.json());
 
 app.use(express.static(path.join(__dirname, 'public'), {
-  maxAge: '1h',
+  maxAge: 0,
   setHeaders(res, filePath) {
-    // HTML, SW, manifest — всегда без кэша, чтобы обновления приходили сразу
-    if (filePath.endsWith('.html') || filePath.endsWith('sw.js') || filePath.endsWith('manifest.json')) {
+    // Все ключевые ресурсы — без кэша, чтобы обновления приходили мгновенно
+    if (filePath.endsWith('.html') || filePath.endsWith('.css') || filePath.endsWith('.js') || filePath.endsWith('manifest.json')) {
       res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+      res.setHeader('Pragma', 'no-cache');
     }
   }
 }));

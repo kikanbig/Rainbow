@@ -276,22 +276,42 @@ html, body {
 
 /* Колокольчик уведомлений — плавает в правом верхнем углу compass-section */
 .notif-bell {
+  /* Полный сброс дефолтных стилей кнопки (Android Chrome) */
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  outline: none;
+  margin: 0;
+  padding: 0;
+  font: inherit;
+  /* Позиционирование */
   position: absolute;
-  top: 16px;
-  right: 20px;
+  top: 12px;
+  right: 16px;
   z-index: 20;
+  /* Размер и форма */
   display: flex;
   align-items: center;
   justify-content: center;
   width: 38px;
   height: 38px;
-  border: 1px solid rgba(255,255,255,0.08);
-  border-radius: 50%;
-  background: rgba(255,255,255,0.06);
+  min-width: 38px;
+  min-height: 38px;
+  /* Стили */
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 50% !important;
+  background: rgba(255,255,255,0.06) !important;
   color: var(--text-muted);
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
   transition: all 0.25s ease;
+  box-shadow: none;
+}
+
+.notif-bell:focus,
+.notif-bell:hover {
+  outline: none;
+  box-shadow: none;
 }
 
 .notif-bell:active {
@@ -300,7 +320,7 @@ html, body {
 
 .notif-bell.notif-active {
   color: var(--accent);
-  background: rgba(85, 136, 255, 0.15);
+  background: rgba(85, 136, 255, 0.15) !important;
   border-color: rgba(85, 136, 255, 0.3);
 }
 
