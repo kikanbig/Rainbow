@@ -93,6 +93,27 @@ app.post('/api/push/update-location', (req, res) => {
   res.json({ success: true });
 });
 
+// ═══ Статистика подписчиков (для админки) ═══
+app.get('/api/push/stats', (req, res) => {
+  const count = notifications.getSubscriberCount();
+  res.json({ count });
+});
+
+// ═══ Отправить broadcast-уведомление всем (для админки) ═══
+app.post('/api/push/broadcast', async (req, res) => {
+  const { title, body } = req.body;
+  if (!title || !body) {
+    return res.status(400).json({ error: 'Нужны title и body' });
+  }
+  try {
+    const result = await notifications.broadcastNotification(title, body);
+    res.json(result);
+  } catch (err) {
+    console.error('[Server] Ошибка broadcast:', err);
+    res.status(500).json({ error: 'Ошибка отправки' });
+  }
+});
+
 // ═══ Proxy: текущая погода ═══
 app.get('/api/weather', async (req, res) => {
   const { lat, lon } = req.query;
@@ -131,6 +152,11 @@ app.get('/api/forecast', async (req, res) => {
     console.error('Forecast API error:', err);
     res.status(500).json({ error: 'Ошибка получения прогноза' });
   }
+});
+
+// Админ-панель для отправки push-уведомлений
+app.get('/push', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'admin.html'));
 });
 
 // SPA fallback

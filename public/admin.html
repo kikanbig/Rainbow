@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin - Push Notifications</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .container {
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      padding: 40px;
+      max-width: 500px;
+      width: 100%;
+    }
+
+    h1 {
+      font-size: 28px;
+      font-weight: 700;
+      color: #1a1a1a;
+      margin-bottom: 8px;
+    }
+
+    .subtitle {
+      font-size: 14px;
+      color: #666;
+      margin-bottom: 32px;
+    }
+
+    .stats {
+      background: #f7f9fc;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .stats-icon {
+      font-size: 32px;
+    }
+
+    .stats-text {
+      flex: 1;
+    }
+
+    .stats-label {
+      font-size: 12px;
+      color: #999;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .stats-value {
+      font-size: 24px;
+      font-weight: 700;
+      color: #667eea;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      font-size: 14px;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 8px;
+    }
+
+    input, textarea {
+      width: 100%;
+      padding: 12px 16px;
+      border: 2px solid #e0e0e0;
+      border-radius: 8px;
+      font-size: 15px;
+      font-family: inherit;
+      transition: border-color 0.2s;
+    }
+
+    input:focus, textarea:focus {
+      outline: none;
+      border-color: #667eea;
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 100px;
+    }
+
+    .btn {
+      width: 100%;
+      padding: 14px 24px;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      font-weight: 600;
+      color: white;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn:active {
+      transform: scale(0.98);
+    }
+
+    .btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .message {
+      margin-top: 20px;
+      padding: 12px 16px;
+      border-radius: 8px;
+      font-size: 14px;
+      display: none;
+    }
+
+    .message.success {
+      background: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+
+    .message.error {
+      background: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+    }
+
+    .message.show {
+      display: block;
+      animation: slideIn 0.3s ease;
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .hint {
+      font-size: 13px;
+      color: #999;
+      margin-top: 6px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🌈 Push Admin</h1>
+    <p class="subtitle">Отправка уведомлений подписчикам Rainbow Finder</p>
+
+    <div class="stats">
+      <div class="stats-icon">👥</div>
+      <div class="stats-text">
+        <div class="stats-label">Подписчиков</div>
+        <div class="stats-value" id="subscriber-count">—</div>
+      </div>
+    </div>
+
+    <form id="push-form">
+      <div class="form-group">
+        <label for="title">Заголовок</label>
+        <input 
+          type="text" 
+          id="title" 
+          name="title" 
+          placeholder="🌈 Радуга рядом!" 
+          required
+          maxlength="50"
+        >
+        <div class="hint">Максимум 50 символов</div>
+      </div>
+
+      <div class="form-group">
+        <label for="body">Сообщение</label>
+        <textarea 
+          id="body" 
+          name="body" 
+          placeholder="Посмотрите на небо — сейчас отличные условия для радуги!"
+          required
+          maxlength="200"
+        ></textarea>
+        <div class="hint">Максимум 200 символов</div>
+      </div>
+
+      <button type="submit" class="btn" id="send-btn">
+        Отправить всем
+      </button>
+    </form>
+
+    <div id="message" class="message"></div>
+  </div>
+
+  <script>
+    const form = document.getElementById('push-form');
+    const sendBtn = document.getElementById('send-btn');
+    const messageEl = document.getElementById('message');
+    const countEl = document.getElementById('subscriber-count');
+
+    // Загрузить статистику
+    async function loadStats() {
+      try {
+        const res = await fetch('/api/push/stats');
+        const data = await res.json();
+        countEl.textContent = data.count || 0;
+      } catch (e) {
+        countEl.textContent = '?';
+      }
+    }
+
+    // Показать сообщение
+    function showMessage(text, type = 'success') {
+      messageEl.textContent = text;
+      messageEl.className = `message ${type} show`;
+      setTimeout(() => {
+        messageEl.classList.remove('show');
+      }, 5000);
+    }
+
+    // Отправка формы
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const title = document.getElementById('title').value.trim();
+      const body = document.getElementById('body').value.trim();
+
+      if (!title || !body) {
+        showMessage('Заполните все поля', 'error');
+        return;
+      }
+
+      sendBtn.disabled = true;
+      sendBtn.textContent = 'Отправка...';
+
+      try {
+        const res = await fetch('/api/push/broadcast', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ title, body })
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+          showMessage(`✅ Отправлено ${data.sent} из ${data.total} подписчиков`, 'success');
+          form.reset();
+          loadStats();
+        } else {
+          showMessage(data.error || 'Ошибка отправки', 'error');
+        }
+      } catch (err) {
+        showMessage('Ошибка сети: ' + err.message, 'error');
+      } finally {
+        sendBtn.disabled = false;
+        sendBtn.textContent = 'Отправить всем';
+      }
+    });
+
+    // Загрузить статистику при загрузке
+    loadStats();
+    setInterval(loadStats, 30000); // Обновлять каждые 30 сек
+  </script>
+</body>
+</html>
