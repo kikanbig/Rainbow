@@ -99,14 +99,14 @@ class RainbowFinderApp {
       // повесим на первый тап по экрану
       this._initOrientationOnGesture();
       
-      // 3. Загружаем погоду
+      // 3. Цитата дня (показываем сразу, не зависит от погоды)
+      this._showQuoteOfTheDay();
+      
+      // 4. Загружаем погоду
       await this._loadWeather();
       
-      // 4. Инициализация push-уведомлений
+      // 5. Инициализация push-уведомлений
       this._initPushNotifications();
-      
-      // 5. Цитата дня
-      this._showQuoteOfTheDay();
       
       // Запускаем обновление
       this._startUpdates();
