@@ -60,15 +60,6 @@ app.get('/api/vapid-public-key', (req, res) => {
   res.json({ publicKey: VAPID_PUBLIC_KEY });
 });
 
-// ═══ Статус уведомлений (для отладки) ═══
-app.get('/api/push/stats', (req, res) => {
-  const stats = notifications.getStats();
-  res.json({
-    ...stats,
-    vapidConfigured: !!(VAPID_PUBLIC_KEY && process.env.VAPID_PRIVATE_KEY)
-  });
-});
-
 // ═══ Подписка на push-уведомления ═══
 app.post('/api/push/subscribe', (req, res) => {
   const { subscription, lat, lon } = req.body;
@@ -100,12 +91,6 @@ app.post('/api/push/update-location', (req, res) => {
     return res.status(404).json({ error: 'Подписка не найдена' });
   }
   res.json({ success: true });
-});
-
-// ═══ ТЕСТОВЫЙ endpoint — отправить уведомление всем (для проверки) ═══
-app.post('/api/push/test', async (req, res) => {
-  const result = await notifications.sendTestNotification();
-  res.json(result);
 });
 
 // ═══ Proxy: текущая погода ═══
