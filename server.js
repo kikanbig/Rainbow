@@ -37,8 +37,8 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public'), {
   maxAge: '1h',
   setHeaders(res, filePath) {
-    // HTML и SW — всегда без кэша, чтобы обновления приходили сразу
-    if (filePath.endsWith('.html') || filePath.endsWith('sw.js')) {
+    // HTML, SW, manifest — всегда без кэша, чтобы обновления приходили сразу
+    if (filePath.endsWith('.html') || filePath.endsWith('sw.js') || filePath.endsWith('manifest.json')) {
       res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
     }
   }
