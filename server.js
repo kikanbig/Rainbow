@@ -95,7 +95,10 @@ app.post('/api/push/update-location', (req, res) => {
   if (!endpoint || lat == null || lon == null) {
     return res.status(400).json({ error: 'Нужны endpoint, lat, lon' });
   }
-  notifications.updateLocation(endpoint, lat, lon);
+  const updated = notifications.updateLocation(endpoint, lat, lon);
+  if (!updated) {
+    return res.status(404).json({ error: 'Подписка не найдена' });
+  }
   res.json({ success: true });
 });
 

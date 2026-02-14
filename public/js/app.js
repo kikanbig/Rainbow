@@ -594,9 +594,18 @@ class RainbowFinderApp {
       const existing = await this.swRegistration.pushManager.getSubscription();
       if (existing) {
         this.pushSubscription = existing;
-        // Обновляем координаты на сервере
-        await this._sendLocationToServer(existing.endpoint);
-        this._updateNotifButton('subscribed');
+        // Пытаемся обновить координаты на сервере
+        try {
+          await this._sendLocationToServer(existing.endpoint);
+          this._updateNotifButton('subscribed');
+          console.log('✅ Подписка восстановлена после обновления');
+        } catch (err) {
+          // Если сервер не знает эту подписку — переподписываемся
+          console.warn('Подписка устарела, переподписываемся...');
+          await existing.unsubscribe();
+          this.pushSubscription = null;
+          this._updateNotifButton('default');
+        }
       } else {
         this._updateNotifButton('default');
       }
@@ -673,15 +682,17 @@ class RainbowFinderApp {
 
   /**
    * Обновляет координаты на сервере
+   * Бросает ошибку если подписка не найдена на сервере
    */
   async _sendLocationToServer(endpoint) {
-    try {
-      await fetch('/api/push/update-location', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ endpoint, lat: this.lat, lon: this.lon })
-      });
-    } catch (e) { /* тихо */ }
+    const res = await fetch('/api/push/update-location', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ endpoint, lat: this.lat, lon: this.lon })
+    });
+    if (!res.ok) {
+      throw new Error(`Server returned ${res.status}`);
+    }
   }
 
   /**
