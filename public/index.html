@@ -17,9 +17,18 @@
   <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png">
   
   <link rel="stylesheet" href="/css/style.css?v=20">
+  <style>
+    /* КРИТИЧЕСКИЙ СТИЛЬ - обход кэша */
+    html, body {
+      background: transparent !important;
+    }
+    #app {
+      background: url('/images/rainbow-bg-2026.jpg') center/cover no-repeat fixed !important;
+    }
+  </style>
 </head>
 <body>
-  <div id="app" class="theme-day">
+  <div id="app">
 
     <!-- ========== ЭКРАН ОШИБКИ ========== -->
     <div id="error-screen" class="screen">
