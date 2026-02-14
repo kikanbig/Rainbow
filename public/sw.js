@@ -1,4 +1,4 @@
-const CACHE_NAME = 'rainbow-finder-v20';
+const CACHE_NAME = 'rainbow-finder-v21';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
@@ -57,7 +57,13 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Статика — Network first, fallback cache (быстрее подхватывает обновления)
+  // CSS и картинки — ТОЛЬКО сеть, БЕЗ кэша
+  if (url.pathname.endsWith('.css') || url.pathname.includes('/images/')) {
+    event.respondWith(fetch(request));
+    return;
+  }
+
+  // Остальная статика — Network first, fallback cache
   event.respondWith(
     fetch(request)
       .then((response) => {
