@@ -597,14 +597,33 @@ class RainbowFinderApp {
           this._updateNotifButton('subscribed');
           console.log('✅ Подписка восстановлена после обновления');
         } catch (err) {
-          // Если сервер не знает эту подписку — переподписываемся
-          console.warn('Подписка устарела, переподписываемся...');
-          await existing.unsubscribe();
-          this.pushSubscription = null;
-          this._updateNotifButton('default');
+          // Сервер не знает подписку (перезапуск/деплой) — заново регистрируем её
+          console.warn('Сервер потерял подписку, перерегистрация...');
+          try {
+            await fetch('/api/push/subscribe', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                subscription: existing.toJSON(),
+                lat: this.lat,
+                lon: this.lon
+              })
+            });
+            this._updateNotifButton('subscribed');
+            console.log('✅ Подписка перерегистрирована на сервере');
+          } catch (resubErr) {
+            console.error('Ошибка перерегистрации:', resubErr);
+            this._updateNotifButton('subscribed');
+          }
         }
       } else {
-        this._updateNotifButton('default');
+        // Нет подписки, но если разрешение уже дано — подписываемся автоматически
+        if (Notification.permission === 'granted') {
+          console.log('Разрешение есть, автоподписка...');
+          await this.subscribePush();
+        } else {
+          this._updateNotifButton('default');
+        }
       }
     } catch (e) {
       console.warn('Push check error:', e);
